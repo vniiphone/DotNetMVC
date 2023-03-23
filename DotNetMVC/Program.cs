@@ -3,6 +3,7 @@ using EmailService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using VNPayment;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,12 @@ builder.Services.AddSingleton(emailConfig);
 
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 
+
+//VnPayment
+var VNPayConfig = builder.Configuration.GetSection("VNPayConfig").Get<VNPayConfig>();
+builder.Services.AddSingleton(VNPayConfig);
+
+builder.Services.AddScoped<IVNPayPayment, VNPayPayment>();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -57,10 +64,11 @@ app.UseEndpoints(endpoints =>
       pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
     );
     endpoints.MapControllerRoute(
-        name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+      name: "default",
+      pattern: "{controller=Home}/{action=Index}/{id?}"
+    );
+    endpoints.MapRazorPages();
 });
 
-app.MapRazorPages();
 
 app.Run();
