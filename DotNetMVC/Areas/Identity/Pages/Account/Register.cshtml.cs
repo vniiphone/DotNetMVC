@@ -18,6 +18,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using EmailService;
+using MimeKit.Text;
 
 namespace DotNetMVC.Areas.Identity.Pages.Account
 {
@@ -28,14 +30,14 @@ namespace DotNetMVC.Areas.Identity.Pages.Account
         private readonly IUserStore<IdentityUser> _userStore;
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
-        private readonly IEmailSender _emailSender;
+        private readonly EmailService.IEmailSender _emailSender;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            EmailService.IEmailSender emailSender)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -131,8 +133,9 @@ namespace DotNetMVC.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+                    Message mssg = new Message(new string[] { Input.Email }, "Confirm your email", $"<!DOCTYPE html>Please confirm your account by <a href='{callbackUrl}'>clicking here</a>.</html>");
+                    _emailSender.SendEmail(mssg);
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
