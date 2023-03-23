@@ -2,6 +2,7 @@ using DotNetMVC.Data;
 using EmailService;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using VNPayment;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,12 @@ builder.Services.AddSingleton(emailConfig);
 
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 
+
+//VnPayment
+var VNPayConfig = builder.Configuration.GetSection("VNPayConfig").Get<VNPayConfig>();
+builder.Services.AddSingleton(VNPayConfig);
+
+builder.Services.AddScoped<IVNPayPayment, VNPayPayment>();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
