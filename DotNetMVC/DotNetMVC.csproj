@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EmailService\EmailService.csproj" />
+    <ProjectReference Include="..\VNPayment\VNPayment.csproj" />
   </ItemGroup>
 
   <ItemGroup>
